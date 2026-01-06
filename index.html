@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TAIPEI VIBES | 你的深度台北導航</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap');
+        
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #0a0a0a;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .glass-nav {
+            background: rgba(10, 10, 10, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .gradient-text {
+            background: linear-gradient(to right, #60a5fa, #818cf8, #34d399);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .glow-sphere {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .step-transition {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .option-card:hover {
+            transform: translateX(8px);
+            border-color: rgba(59, 130, 246, 0.4);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .loader-ring {
+            border-top-color: #3b82f6;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hide { display: none; }
+    </style>
+</head>
+<body>
+
+    <!-- 導航欄 -->
+    <nav class="fixed top-0 w-full z-50 glass-nav px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center gap-3 cursor-pointer group" onclick="showStep('home')">
+            <div class="w-10 h-10 bg-gradient-to-tr from-blue-600 to-emerald-500 rounded-xl flex items-center justify-center font-bold text-lg group-hover:rotate-12 transition-transform">
+                北
+            </div>
+            <div class="flex flex-col leading-none">
+                <span class="font-black text-xl tracking-tight uppercase">Taipei Vibes</span>
+                <span class="text-[10px] text-neutral-500 tracking-widest uppercase">Travel Guide</span>
+            </div>
+        </div>
+        <div class="hidden md:flex gap-10 text-xs font-bold tracking-widest uppercase text-neutral-400">
+            <button class="hover:text-blue-400 transition-colors">探索地圖</button>
+            <button class="hover:text-blue-400 transition-colors">文化故事</button>
+            <button onclick="startQuiz()" class="text-white px-4 py-2 bg-white/5 rounded-full border border-white/10 hover:border-blue-500/50 transition-all flex items-center gap-2">
+                <i class="fas fa-sparkles text-blue-400"></i> 開始測驗
+            </button>
+        </div>
+    </nav>
+
+    <!-- 背景裝飾 -->
+    <div class="glow-sphere w-96 h-96 bg-blue-600/10 top-1/4 left-1/4"></div>
+    <div class="glow-sphere w-96 h-96 bg-emerald-600/5 bottom-1/4 right-1/4"></div>
+
+    <!-- 首頁面 -->
+    <section id="home-step" class="relative h-screen flex flex-col items-center justify-center px-6 text-center">
+        <div class="absolute inset-0 -z-10">
+            <img src="https://images.unsplash.com/photo-1470004914212-05527e49370b?auto=format&fit=crop&q=80&w=2000" class="w-full h-full object-cover opacity-20" alt="Taipei">
+            <div class="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/40 to-transparent"></div>
+        </div>
+        
+        <div class="max-w-4xl space-y-8 fade-in">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs font-bold text-blue-400 tracking-widest uppercase">
+                <i class="fas fa-location-dot"></i> 你的深度台北導航
+            </div>
+            <h1 class="text-5xl md:text-8xl font-black mb-6 leading-tight tracking-tighter">
+                精準捕捉<br/>你的 <span class="gradient-text">城市靈魂</span>
+            </h1>
+            <p class="text-lg md:text-xl text-neutral-400 max-w-2xl mx-auto font-light leading-relaxed">
+                不僅僅是景點，更是一場關於自我的對話。<br/>
+                透過 6 個維度的深度測驗，為你媒合最契合此刻心情的台北角落。
+            </p>
+            <div class="pt-10 flex flex-col md:flex-row items-center justify-center gap-4">
+                <button onclick="startQuiz()" class="bg-white text-black px-12 py-5 rounded-2xl font-black text-lg hover:bg-blue-500 hover:text-white transition-all active:scale-95 flex items-center gap-3">
+                    開始 6D 心情測驗 <i class="fas fa-chevron-right text-sm"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- 問卷頁面 -->
+    <section id="quiz-step" class="hide max-w-2xl mx-auto px-6 py-32 min-h-screen flex flex-col justify-center relative z-10">
+        <div id="quiz-content">
+            <div class="mb-12 flex justify-between items-end border-b border-white/5 pb-8">
+                <div class="space-y-2">
+                    <span id="q-number" class="text-blue-500 font-black text-sm uppercase tracking-[0.3em]">Question 01</span>
+                    <h2 id="q-title" class="text-3xl md:text-4xl font-black leading-tight">題目加載中...</h2>
+                    <p id="q-feedback" class="text-neutral-500 italic">台北的多元，正適合此刻的你。</p>
+                </div>
+                <div class="text-neutral-800 font-mono text-4xl font-black">
+                    <span id="curr-idx">1</span><span class="text-xl text-neutral-900">/</span>6
+                </div>
+            </div>
+            
+            <div id="options-container" class="grid gap-4">
+                <!-- 選項由 JS 生成 -->
+            </div>
+            
+            <div class="mt-12 h-1 bg-white/5 rounded-full overflow-hidden">
+                <div id="progress-bar" class="h-full bg-blue-500 transition-all duration-700 ease-out" style="width: 16.6%"></div>
+            </div>
+        </div>
+
+        <!-- 分析中動畫 -->
+        <div id="analyzing-content" class="hide text-center space-y-8">
+            <div class="w-24 h-24 border-4 border-white/5 border-t-blue-500 rounded-full flex items-center justify-center mx-auto loader-ring">
+                <i class="fas fa-sparkles text-blue-400 text-2xl"></i>
+            </div>
+            <h2 class="text-3xl font-black">AI 正在深度分析你的偏好...</h2>
+            <div class="space-y-2">
+                <p id="match-status" class="text-neutral-500 italic">正在從 12,000 個台北角落尋找對應頻率...</p>
+                <p class="text-blue-400 text-sm font-mono tracking-widest uppercase animate-bounce mt-4">Match Finding...</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 結果頁面 -->
+    <section id="results-step" class="hide max-w-7xl mx-auto px-6 py-32">
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+            <div class="space-y-4">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-xs font-bold text-blue-400 uppercase tracking-widest">
+                    Match Analysis Complete
+                </div>
+                <h2 class="text-5xl font-black tracking-tighter">為你讀出的，<br/>此刻台北頻率</h2>
+                <p id="result-summary" class="text-neutral-400 text-lg max-w-xl">
+                    根據你的測驗結果，我們為你挑選了以下最契合的地點。
+                </p>
+            </div>
+            <button onclick="startQuiz()" class="px-6 py-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-bold flex items-center gap-2 transition-all">
+                <i class="fas fa-rotate-right"></i> 重新校準心情
+            </button>
+        </div>
+
+        <div id="results-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
+            <!-- 結果卡片由 JS 生成 -->
+        </div>
+    </section>
+
+    <!-- 腳部 -->
+    <footer class="border-t border-white/5 py-20 px-6 bg-black text-center md:text-left">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-12">
+            <div class="space-y-4">
+                <div class="font-black text-2xl tracking-tighter">TAIPEI VIBES</div>
+                <p class="text-neutral-500 text-sm">每一場旅行，都是與自己重新相遇的機會。</p>
+            </div>
+            <div class="flex gap-10 text-neutral-500 text-sm font-bold uppercase tracking-widest">
+                <a href="#" class="hover:text-blue-400">Instagram</a>
+                <a href="#" class="hover:text-blue-400">Facebook</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const ATTRACTS_DATA = [
+            { id: 1, name: '象山步道', tags: ['自然', '體能', '百萬夜景'], image: 'https://images.unsplash.com/photo-1552912811-060105ac905e?w=800', desc: '這是台北最具代表性的視角。俯瞰整座 101 與繁華的信義區風景。', reason: '你需要一場登高望遠的洗禮。', preference: { vibe: 'nature', pace: 'active', time: 'night', social: 'solo', sense: 'vision', mood: 'reset' } },
+            { id: 2, name: '大稻埕碼頭', tags: ['人文', '夕陽', '浪漫'], image: 'https://images.unsplash.com/photo-1571431215288-75e11f9746b1?w=800', desc: '時光在這裡慢了下來。漫步在老街與河岸邊，擁有最美的淡水河夕陽。', reason: '老派的浪漫最適合現在的你。', preference: { vibe: 'culture', pace: 'chill', time: 'day', social: 'pair', sense: 'vision', mood: 'relax' } },
+            { id: 3, name: '台北流行音樂中心', tags: ['現代', '建築', '視覺'], image: 'https://images.unsplash.com/photo-1612048590124-71578335028c?w=800', desc: '前衛的稜角建築與純粹的幾何美學，是台北新興的攝影聖地。', reason: '你對美感有著不凡的追求。', preference: { vibe: 'modern', pace: 'chill', time: 'day', social: 'solo', sense: 'vision', mood: 'inspire' } },
+            { id: 4, name: '陽明山小油坑', tags: ['壯麗', '地熱', '冒險'], image: 'https://images.unsplash.com/photo-1605342082260-96f3c95e1c25?w=800', desc: '感受大地的脈動。噴氣孔與山霧繚繞，彷彿置身於另一個星球。', reason: '暫時逃離都會煙塵。', preference: { vibe: 'nature', pace: 'active', time: 'day', social: 'group', sense: 'vision', mood: 'reset' } },
+            { id: 5, name: '內湖 碧山巖', tags: ['靈性', '寺廟', '夜景'], image: 'https://images.unsplash.com/photo-1583226433535-98319f6a70a1?w=800', desc: '全台最大的開漳聖王廟。其展望台是觀看台北燈火的絕佳秘密基地。', reason: '在古老神明的注視下找回寧靜。', preference: { vibe: 'culture', pace: 'chill', time: 'night', social: 'solo', sense: 'vision', mood: 'relax' } },
+            { id: 6, name: '心中山線形公園', tags: ['潮流', '文青', '城市'], image: 'https://images.unsplash.com/photo-1542931287-023b922fa89b?w=800', desc: '串連中山與雙連的綠帶。充滿巧思的公共藝術與週末市集。', reason: '城市轉角的驚喜最能滿足你。', preference: { vibe: 'modern', pace: 'chill', time: 'day', social: 'group', sense: 'taste', mood: 'inspire' } }
+        ];
+
+        const QUESTIONS = [
+            { id: 'vibe', title: '今天的你，想被什麼包圍？', feedback: '台北的多元，正適合此刻的你。', options: [{ value: 'nature', label: '大自然的呼吸', sub: '森林、山嶺、芬多精', icon: 'fa-leaf' }, { value: 'culture', label: '歷史的厚度', sub: '老街、古蹟、人文故事', icon: 'fa-camera' }, { value: 'modern', label: '都會的律動', sub: '現代設計、光影、節奏', icon: 'fa-bolt' }] },
+            { id: 'social', title: '這次冒險的旅伴是？', feedback: '獨處或共享，都有專屬的風景。', options: [{ value: 'solo', label: '一個人的獨處', sub: '安靜對話，隨心所欲', icon: 'fa-user' }, { value: 'pair', label: '兩個人的浪漫', sub: '分享光影，留下回憶', icon: 'fa-heart' }, { value: 'group', label: '一群人的歡樂', sub: '集體冒險，共創話題', icon: 'fa-users' }] },
+            { id: 'time', title: '你最嚮往哪種光影？', feedback: '不同的時間點，台北有不同的靈魂。', options: [{ value: 'day', label: '明媚陽光', sub: '清澈視野，生機勃勃', icon: 'fa-sun' }, { value: 'night', label: '華燈初上', sub: '霓虹流彩，醉人夜色', icon: 'fa-moon' }] },
+            { id: 'sense', title: '哪種感官覺醒會讓你驚艷？', feedback: '透過五感，你會更深刻地記住這座城市。', options: [{ value: 'vision', label: '視覺饗宴', sub: '地標、絕景、建築美學', icon: 'fa-eye' }, { value: 'taste', label: '味道記憶', sub: '美食、咖啡、茶香', icon: 'fa-mug-hot' }, { value: 'sound', label: '聲音脈動', sub: '音樂、溪流、取靜', icon: 'fa-music' }] },
+            { id: 'mood', title: '目前的心情狀態最接近？', feedback: '讓我們為你的心情找一個出口。', options: [{ value: 'relax', label: '想徹底放空', sub: '什麼都不做，靜待', icon: 'fa-cloud' }, { value: 'reset', label: '想找回動力', sub: '挑戰自我，重新出發', icon: 'fa-battery-full' }, { value: 'inspire', label: '想尋找靈感', sub: '接觸新奇，激發想像', icon: 'fa-lightbulb' }] },
+            { id: 'pace', title: '你的體力儲備狀況？', feedback: '最後一步，幫你拿捏最舒適的節奏。', options: [{ value: 'chill', label: '只想優雅散步', sub: '平緩路徑，隨處可坐', icon: 'fa-shoe-prints' }, { value: 'active', label: '可以流點汗水', sub: '階梯步道，挑戰高度', icon: 'fa-fire' }] }
+        ];
+
+        let currentStepIdx = 0;
+        let userAnswers = {};
+        let favorites = [];
+
+        function showStep(id) {
+            document.querySelectorAll('section').forEach(s => s.classList.add('hide'));
+            document.getElementById(`${id}-step`).classList.remove('hide');
+            window.scrollTo(0, 0);
+        }
+
+        function startQuiz() {
+            currentStepIdx = 0;
+            userAnswers = {};
+            showStep('quiz');
+            renderQuestion();
+            document.getElementById('quiz-content').classList.remove('hide');
+            document.getElementById('analyzing-content').classList.add('hide');
+        }
+
+        function renderQuestion() {
+            const q = QUESTIONS[currentStepIdx];
+            document.getElementById('q-number').innerText = `Question 0${currentStepIdx + 1}`;
+            document.getElementById('q-title').innerText = q.title;
+            document.getElementById('q-feedback').innerText = q.feedback;
+            document.getElementById('curr-idx').innerText = currentStepIdx + 1;
+            document.getElementById('progress-bar').style.width = `${((currentStepIdx + 1) / QUESTIONS.length) * 100}%`;
+
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            q.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option-card flex items-center gap-6 p-6 bg-white/[0.02] border border-white/5 rounded-[2rem] text-left group transition-all relative overflow-hidden';
+                btn.onclick = () => handleAnswer(q.id, opt.value);
+                btn.innerHTML = `
+                    <div class="w-16 h-16 rounded-2xl bg-neutral-900 border border-white/5 flex items-center justify-center group-hover:bg-blue-600 transition-all shrink-0">
+                        <i class="fas ${opt.icon} text-xl"></i>
+                    </div>
+                    <div>
+                        <span class="block text-xl font-bold mb-1">${opt.label}</span>
+                        <span class="text-sm text-neutral-500">${opt.sub}</span>
+                    </div>
+                    <i class="fas fa-chevron-right ml-auto opacity-0 group-hover:opacity-100 transition-all"></i>
+                `;
+                container.appendChild(btn);
+            });
+        }
+
+        function handleAnswer(key, value) {
+            userAnswers[key] = value;
+            if (currentStepIdx < QUESTIONS.length - 1) {
+                currentStepIdx++;
+                setTimeout(renderQuestion, 200);
+            } else {
+                startAnalysis();
+            }
+        }
+
+        function startAnalysis() {
+            document.getElementById('quiz-content').classList.add('hide');
+            document.getElementById('analyzing-content').classList.remove('hide');
+            
+            const statuses = ["對照視覺偏好...", "計算體力負荷...", "匹配心靈頻率...", "準備專屬導覽..."];
+            let sIdx = 0;
+            const interval = setInterval(() => {
+                if (sIdx < statuses.length) {
+                    document.getElementById('match-status').innerText = statuses[sIdx];
+                    sIdx++;
+                } else {
+                    clearInterval(interval);
+                    showResults();
+                }
+            }, 500);
+        }
+
+        function showResults() {
+            const results = ATTRACTS_DATA.map(item => {
+                let score = 0;
+                if (item.preference.vibe === userAnswers.vibe) score += 3;
+                if (item.preference.mood === userAnswers.mood) score += 2;
+                if (item.preference.time === userAnswers.time) score += 1;
+                return { ...item, score };
+            }).sort((a, b) => b.score - a.score).slice(0, 3);
+
+            const grid = document.getElementById('results-grid');
+            grid.innerHTML = '';
+            
+            results.forEach((item, idx) => {
+                const card = document.createElement('div');
+                card.className = 'group bg-neutral-900 rounded-[2.5rem] overflow-hidden border border-white/5 hover:border-blue-500/30 transition-all shadow-2xl fade-in';
+                card.style.animationDelay = `${idx * 200}ms`;
+                card.innerHTML = `
+                    <div class="h-64 overflow-hidden relative">
+                        <img src="${item.image}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000">
+                        <button onclick="toggleFav(${item.id})" class="absolute top-6 right-6 w-10 h-10 bg-black/20 backdrop-blur-md rounded-xl flex items-center justify-center hover:bg-red-500 transition-all">
+                            <i class="fas fa-heart ${favorites.includes(item.id) ? 'text-white' : 'text-white/60'}"></i>
+                        </button>
+                    </div>
+                    <div class="p-8 space-y-6">
+                        <div class="space-y-2">
+                            <div class="text-blue-400 text-xs font-black uppercase tracking-widest"><i class="fas fa-sparkles"></i> AI 靈魂共鳴</div>
+                            <p class="text-white font-medium italic">「${item.reason}」</p>
+                        </div>
+                        <h3 class="text-2xl font-black">${item.name}</h3>
+                        <p class="text-neutral-500 text-sm leading-relaxed">${item.desc}</p>
+                        <div class="pt-4 flex gap-3">
+                            <button class="flex-1 py-4 rounded-xl bg-white text-black font-black text-sm hover:bg-blue-500 hover:text-white transition-all">查看導覽</button>
+                            <button class="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center"><i class="fas fa-share-nodes text-neutral-400"></i></button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+
+            showStep('results');
+        }
+
+        function toggleFav(id) {
+            if (favorites.includes(id)) {
+                favorites = favorites.filter(f => f !== id);
+            } else {
+                favorites.push(id);
+            }
+            // 重新渲染結果以更新視覺
+            showResults();
+        }
+
+        // 初始化
+        window.onload = () => showStep('home');
+    </script>
+</body>
+</html>
